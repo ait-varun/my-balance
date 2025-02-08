@@ -1,7 +1,13 @@
+"use client";
+
 import { GalleryVerticalEnd } from "lucide-react";
 import { LoginForm } from "../login-form";
 
 export default function AuthContainer() {
+
+  const handleGoogleLogin = () => {
+    console.log("Login with Google clicked");
+  };
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -11,7 +17,7 @@ export default function AuthContainer() {
           </div>
           My Account Expenses
         </a>
-        <LoginForm />
+        <LoginForm  handleGoogleLogin={handleGoogleLogin} />
       </div>
     </div>
   );
