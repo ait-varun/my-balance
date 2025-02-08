@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { z } from "zod";
 
 const schema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().optional(),
@@ -29,7 +30,7 @@ export function LoginForm({
   ...props
 }: React.ComponentPropsWithoutRef<"div"> & { handleGoogleLogin: () => void }) {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ email: "", password: "", confirmPassword: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const toggleAuthMode = () => {
@@ -57,12 +58,31 @@ export function LoginForm({
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log("Form submitted:", formData);
+    if (!validateForm()) return;
+  
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.message || "Something went wrong");
+      }
+  
+      console.log("Signup successful", data);
+      alert("Signup successful!");
+    } catch (error) {
+      console.error("Signup error:", error);
+      alert(error);
     }
   };
+  
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -80,32 +100,37 @@ export function LoginForm({
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" value={formData.email} onChange={handleChange} className={errors.email ? "border-red-500" : ""} autoComplete="email" />
-                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" value={formData.password} onChange={handleChange} className={errors.password ? "border-red-500" : ""}  />
-                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-              </div>
-              {!isLogin && (
-                <div className="grid gap-2">
-                  <Label htmlFor="confirmPassword">Confirm Password</Label>
-                  <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} className={errors.confirmPassword ? "border-red-500" : ""}  />
-                  {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" type="text" value={formData.name} onChange={handleChange} className={errors.name ? "border-red-500" : ""} autoComplete="name" />
+                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                 </div>
-              )}
-              <Button type="submit" className="w-full">
-                {isLogin ? "Login" : "Sign up"}
-              </Button>
-              <div className="text-center text-sm mt-4">
-                {isLogin ? "Don't have an account?" : "Already have an account?"} {" "}
-                <button type="button" onClick={toggleAuthMode} className="underline underline-offset-4 hover:text-primary">
-                  {isLogin ? "Sign up" : "Login"}
-                </button>
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" value={formData.email} onChange={handleChange} className={errors.email ? "border-red-500" : ""} autoComplete="email" />
+                  {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" value={formData.password} onChange={handleChange} className={errors.password ? "border-red-500" : ""} />
+                  {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+                </div>
+                {!isLogin && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} className={errors.confirmPassword ? "border-red-500" : ""} />
+                    {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+                  </div>
+                )}
+                <Button type="submit" className="w-full">
+                  {isLogin ? "Login" : "Sign up"}
+                </Button>
+                <div className="text-center text-sm mt-4">
+                  {isLogin ? "Don't have an account?" : "Already have an account?"} {" "}
+                  <button type="button" onClick={toggleAuthMode} className="underline underline-offset-4 hover:text-primary">
+                    {isLogin ? "Sign up" : "Login"}
+                  </button>
+                </div>
               </div>
-            </div>
           </form>
         </CardContent>
       </Card>
