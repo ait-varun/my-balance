@@ -68,6 +68,11 @@ export function LoginForm({
         return toast({ title: data.message || "Login failed" });
       }
 
+       // Save user data in localStorage
+    if (data.user) {
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
+
       toast({
         title: "Login successful",
         description: `Welcome back, ${data.user?.email}`,
