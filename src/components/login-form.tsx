@@ -63,7 +63,8 @@ export function LoginForm({
     if (!validateForm()) return;
   
     try {
-      const res = await fetch("/api/auth/signup", {
+      const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -74,15 +75,13 @@ export function LoginForm({
         throw new Error(data.message || "Something went wrong");
       }
   
-      console.log("Signup successful", data);
-      alert("Signup successful!");
+      console.log(`${isLogin ? "Login" : "Signup"} successful`, data);
+      alert(`${isLogin ? "Login" : "Signup"} successful!`);
     } catch (error) {
-      console.error("Signup error:", error);
+      console.error("Auth error:", error);
       alert(error);
     }
   };
-  
-
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -99,38 +98,40 @@ export function LoginForm({
           </div>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-6">
+              {!isLogin && (
+                <div className="grid gap-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input id="name" type="text" value={formData.name} onChange={handleChange} className={errors.name ? "border-red-500" : ""} autoComplete="name" />
+                  {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                </div>
+              )}
               <div className="grid gap-2">
-                <Label htmlFor="name">Name</Label>
-                <Input id="name" type="text" value={formData.name} onChange={handleChange} className={errors.name ? "border-red-500" : ""} autoComplete="name" />
-                {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" value={formData.email} onChange={handleChange} className={errors.email ? "border-red-500" : ""} autoComplete="email" />
-                  {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" value={formData.password} onChange={handleChange} className={errors.password ? "border-red-500" : ""} />
-                  {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
-                </div>
-                {!isLogin && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} className={errors.confirmPassword ? "border-red-500" : ""} />
-                    {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
-                  </div>
-                )}
-                <Button type="submit" className="w-full">
-                  {isLogin ? "Login" : "Sign up"}
-                </Button>
-                <div className="text-center text-sm mt-4">
-                  {isLogin ? "Don't have an account?" : "Already have an account?"} {" "}
-                  <button type="button" onClick={toggleAuthMode} className="underline underline-offset-4 hover:text-primary">
-                    {isLogin ? "Sign up" : "Login"}
-                  </button>
-                </div>
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" value={formData.email} onChange={handleChange} className={errors.email ? "border-red-500" : ""} autoComplete="email" />
+                {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" value={formData.password} onChange={handleChange} className={errors.password ? "border-red-500" : ""} />
+                {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+              </div>
+              {!isLogin && (
+                <div className="grid gap-2">
+                  <Label htmlFor="confirmPassword">Confirm Password</Label>
+                  <Input id="confirmPassword" type="password" value={formData.confirmPassword} onChange={handleChange} className={errors.confirmPassword ? "border-red-500" : ""} />
+                  {errors.confirmPassword && <p className="text-red-500 text-sm">{errors.confirmPassword}</p>}
+                </div>
+              )}
+              <Button type="submit" className="w-full">
+                {isLogin ? "Login" : "Sign up"}
+              </Button>
+              <div className="text-center text-sm mt-4">
+                {isLogin ? "Don't have an account?" : "Already have an account?"} {" "}
+                <button type="button" onClick={toggleAuthMode} className="underline underline-offset-4 hover:text-primary">
+                  {isLogin ? "Sign up" : "Login"}
+                </button>
+              </div>
+            </div>
           </form>
         </CardContent>
       </Card>
