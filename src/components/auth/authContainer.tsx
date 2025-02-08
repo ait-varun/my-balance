@@ -2,11 +2,18 @@
 
 import { GalleryVerticalEnd } from "lucide-react";
 import { LoginForm } from "../login-form";
+import { useToast } from "@/hooks/use-toast"
+
 
 export default function AuthContainer() {
 
+  const { toast } = useToast()
+
   const handleGoogleLogin = () => {
-    console.log("Login with Google clicked");
+    toast({
+      title: "Login Successful",
+      description: "You have successfully logged in with Google",
+    })
   };
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">

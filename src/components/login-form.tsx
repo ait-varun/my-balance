@@ -13,6 +13,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { z } from "zod";
+import { useToast } from "@/hooks/use-toast"
+
 
 const schema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -32,6 +34,9 @@ export function LoginForm({
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  //toaster
+  const { toast } = useToast()
 
   const toggleAuthMode = () => {
     setIsLogin(!isLogin);
@@ -72,14 +77,22 @@ export function LoginForm({
   
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
+        toast({
+          title: data.message || "Something went wrong",
+          description: data.message || "Something went wrong",
+        })
       }
   
       console.log(`${isLogin ? "Login" : "Signup"} successful`, data);
-      alert(`${isLogin ? "Login" : "Signup"} successful!`);
+      toast({
+        title: data.message || "Something went wrong",
+        description: `${ data.user ? "Name: " + data.user.name : "" }  ${ data.user ? ", Email: " + data.user.email : ""}`,
+      })
     } catch (error) {
       console.error("Auth error:", error);
-      alert(error);
+      toast({
+        title: "Something went wrong"
+      })
     }
   };
 
