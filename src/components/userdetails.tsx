@@ -1,27 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSession, signIn, signOut } from "next-auth/react"
 
 export default function UserDetails() {
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
+  const { data: session } = useSession()
+  if (session) {
+    return (
+      <>
+        Signed in as {session.user?.email} <br />
+        <button onClick={() => signOut()}>Sign out</button>
+      </>
+    )
+  }
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      {user ? (
-        <>
-          <p className="text-lg"><strong>Name:</strong> {user.name}</p>
-          <p className="text-lg"><strong>Email:</strong> {user.email}</p>
-        </>
-      ) : (
-        <p className="text-lg text-gray-500">No user data available.</p>
-      )}
-    </div>
-  );
+    <>
+      Not signed in <br />
+      <button onClick={() => signIn()}>Sign in</button>
+    </>
+  )
 }
